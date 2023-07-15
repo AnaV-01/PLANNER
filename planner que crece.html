@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Planner con Crecimiento de Planta</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-image: url(estefondo.png);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+    }
+    
+    .planner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      color: #b5179e;
+    }
+    
+    .task {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .plant {
+      width: 100px;
+      height: 100px;
+      background-image: url("seed.png");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      transition: background-image 0.5s ease;
+      margin-top: 20px;
+    }
+    
+    .completed {
+      text-decoration: line-through;
+    }
+  </style>
+</head>
+<body>
+  <div class="planner">
+    <h2>Planner con Crecimiento de Planta</h2>
+    
+    <div id="taskContainer"></div>
+    
+    <div class="plant" id="plant"></div>
+    
+    <input type="text" id="taskInput" placeholder="Ingresa una tarea">
+    <button onclick="addTask()">Agregar Tarea</button>
+  </div>
+  
+  <script>
+    const taskContainer = document.getElementById("taskContainer");
+    const taskInput = document.getElementById("taskInput");
+    const plant = document.getElementById("plant");
+    let taskId = 1;
+    let completedTasks = 0;
+    let growthStage = 0;
+    let previousCompletedTasks = 0;
+    
+    function addTask() {
+      const taskText = taskInput.value.trim();
+      
+      if (taskText !== "") {
+        const taskIdString = "task-" + taskId;
+        
+        const taskElement = document.createElement("div");
+        taskElement.id = taskIdString;
+        taskElement.className = "task";
+        
+        const checkboxElement = document.createElement("input");
+        checkboxElement.type = "checkbox";
+        checkboxElement.id = "checkbox-" + taskId;
+        checkboxElement.addEventListener("change", function() {
+          markTaskAsCompleted(taskIdString, checkboxElement.checked);
+        });
+        
+        const labelElement = document.createElement("label");
+        labelElement.htmlFor = "checkbox-" + taskId;
+        labelElement.textContent = taskText;
+        
+        taskElement.appendChild(checkboxElement);
+        taskElement.appendChild(labelElement);
+        taskContainer.appendChild(taskElement);
+        
+        taskInput.value = "";
+        taskInput.focus();
+        
+        taskId++;
+        
+        // Restaurar al estado anterior de la planta si se agrega una tarea más
+        if (completedTasks > previousCompletedTasks) {
+          shrinkPlant();
+        }
+        
+        previousCompletedTasks = completedTasks;
+      }
+    }
+    
+    function markTaskAsCompleted(taskId, completed) {
+      const taskElement = document.getElementById(taskId);
+      
+      if (taskElement) {
+        if (completed) {
+          taskElement.classList.add("completed");
+          completedTasks++;
+          growPlant();
+        } else {
+          taskElement.classList.remove("completed");
+          completedTasks--;
+          shrinkPlant();
+        }
+      }
+    }
+    
+    function growPlant() {
+      if (growthStage < completedTasks) {
+        growthStage++;
+        const imagePath = `planta${growthStage}.png`;
+        plant.style.backgroundImage = `url(${imagePath})`;
+      }
+    }
+    
+    function shrinkPlant() {
+      if (growthStage > 0) {
+        growthStage--;
+        const imagePath = `planta${growthStage}.png`;
+        plant.style.backgroundImage = `url(${imagePath})`;
+      }
+    }
+  </script>
+</body>
+</html>
+
+
+
